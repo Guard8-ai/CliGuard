@@ -1,0 +1,16 @@
+/target
+**/*.rs.bk
+Cargo.lock
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.iml
+
+# TaskGuard
+.taskguard/
+tasks/
+AGENTIC_AI_TASKGUARD_GUIDE.md
