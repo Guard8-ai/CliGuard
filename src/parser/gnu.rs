@@ -170,9 +170,7 @@ fn parse_gnu_options(help_output: &str) -> Vec<Flag> {
     // Filter help/version
     flags
         .into_iter()
-        .filter(|f| {
-            f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version")
-        })
+        .filter(|f| f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version"))
         .collect()
 }
 
@@ -192,9 +190,7 @@ fn parse_gnu_flag(line: &str) -> Option<Flag> {
         return None;
     }
 
-    let value_type = arg_name
-        .as_deref()
-        .map_or(ValueType::Bool, infer_gnu_type);
+    let value_type = arg_name.as_deref().map_or(ValueType::Bool, infer_gnu_type);
 
     // Optional arg if it was in brackets
     let required = arg_name.is_some() && !line.contains("[=");

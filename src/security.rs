@@ -52,9 +52,9 @@ pub fn write_output_safe(path: &Path, content: &str) -> Result<()> {
             if is_symlink(parent) {
                 anyhow::bail!("Output parent directory must not be a symbolic link");
             }
-            let canonical_parent = parent.canonicalize().map_err(|e| {
-                anyhow::anyhow!("Cannot resolve output directory: {e}")
-            })?;
+            let canonical_parent = parent
+                .canonicalize()
+                .map_err(|e| anyhow::anyhow!("Cannot resolve output directory: {e}"))?;
             canonical_parent.join(path.file_name().unwrap_or_default())
         }
     } else {

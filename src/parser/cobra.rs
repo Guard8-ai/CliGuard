@@ -7,13 +7,11 @@ use std::sync::LazyLock;
 
 static RE_VERSION: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\b[vV]?(\d+\.\d+\.\d+(?:-\w+)?)\b").unwrap());
-static RE_COMMAND: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"^\s*(\S+)\s{2,}(.+)$").unwrap());
+static RE_COMMAND: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^\s*(\S+)\s{2,}(.+)$").unwrap());
 static RE_FLAG: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"^\s*(?:(-\w)\s*,\s*)?(?:(--[\w-]+))(?:\s+(\w+))?\s{2,}(.+)$").unwrap()
 });
-static RE_DEFAULT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\(default\s+(.+?)\)").unwrap());
+static RE_DEFAULT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\(default\s+(.+?)\)").unwrap());
 
 pub struct CobraParser;
 
@@ -29,8 +27,10 @@ impl Parser for CobraParser {
     fn detect(&self, help_output: &str) -> bool {
         // Standard Cobra: "Available Commands:" + "Flags:"
         // gh-style Cobra: "CORE COMMANDS:" or "COMMANDS:" (uppercase)
-        let has_standard = help_output.contains("Available Commands:") && help_output.contains("Flags:");
-        let has_uppercase = (help_output.contains("CORE COMMANDS") || help_output.contains("COMMANDS"))
+        let has_standard =
+            help_output.contains("Available Commands:") && help_output.contains("Flags:");
+        let has_uppercase = (help_output.contains("CORE COMMANDS")
+            || help_output.contains("COMMANDS"))
             && (help_output.contains("FLAGS") || help_output.contains("USAGE"));
         has_standard || has_uppercase
     }
@@ -73,7 +73,10 @@ fn parse_description(help_output: &str) -> String {
     let mut lines = Vec::new();
     for line in help_output.lines() {
         let trimmed = line.trim();
-        if trimmed.starts_with("Usage:") || trimmed.starts_with("Available Commands:") || trimmed.starts_with("Flags:") {
+        if trimmed.starts_with("Usage:")
+            || trimmed.starts_with("Available Commands:")
+            || trimmed.starts_with("Flags:")
+        {
             break;
         }
         if !trimmed.is_empty() {
@@ -118,7 +121,10 @@ fn parse_available_commands(
             && !line.starts_with(' ')
             && !line.starts_with('\t')
             && !trimmed_upper.ends_with("COMMANDS")
-            && (trimmed.ends_with(':') || trimmed_upper.starts_with("FLAG") || trimmed_upper.starts_with("USAGE") || trimmed_upper.starts_with("LEARN"))
+            && (trimmed.ends_with(':')
+                || trimmed_upper.starts_with("FLAG")
+                || trimmed_upper.starts_with("USAGE")
+                || trimmed_upper.starts_with("LEARN"))
         {
             if !current_cmds.is_empty() {
                 groups.push(CommandGroup {
@@ -144,8 +150,12 @@ fn parse_available_commands(
             let mut full_cmd = cmd;
             if depth < MAX_SUBCOMMAND_DEPTH {
                 if let Some(sub_output) = sub_help(&full_cmd.name) {
-                    let (sub_cmds, _) =
-                        parse_available_commands(&sub_output, &format!("{binary_name} {}", full_cmd.name), sub_help, depth + 1);
+                    let (sub_cmds, _) = parse_available_commands(
+                        &sub_output,
+                        &format!("{binary_name} {}", full_cmd.name),
+                        sub_help,
+                        depth + 1,
+                    );
                     full_cmd.subcommands = sub_cmds;
                     full_cmd.flags = parse_flags_section(&sub_output, "Flags:");
                     full_cmd.args = parse_args_from_usage(&sub_output);

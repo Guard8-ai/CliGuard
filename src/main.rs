@@ -11,7 +11,11 @@ use clap::Parser;
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "cliguard", version, about = "Auto-generate agentic AI guides from CLI help output")]
+#[command(
+    name = "cliguard",
+    version,
+    about = "Auto-generate agentic AI guides from CLI help output"
+)]
 struct Cli {
     /// The CLI binary to generate a guide for
     binary: String,
@@ -46,7 +50,9 @@ fn parse_framework(name: &str) -> Result<Framework> {
         "click" => Ok(Framework::Click),
         "argparse" => Ok(Framework::Argparse),
         "gnu" => Ok(Framework::GnuStyle),
-        other => anyhow::bail!("Unknown framework: {other}. Supported: clap, cobra, click, argparse, gnu"),
+        other => anyhow::bail!(
+            "Unknown framework: {other}. Supported: clap, cobra, click, argparse, gnu"
+        ),
     }
 }
 
@@ -54,12 +60,12 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     // Resolve binary path
-    let binary_path = ParserRegistry::resolve_binary(&cli.binary)
-        .context("Could not find binary")?;
+    let binary_path =
+        ParserRegistry::resolve_binary(&cli.binary).context("Could not find binary")?;
 
     // Get help output
-    let help_output = runner::get_help(&binary_path)
-        .context("Could not get help output from binary")?;
+    let help_output =
+        runner::get_help(&binary_path).context("Could not get help output from binary")?;
 
     // Get version (used to supplement parsed spec)
     let detected_version = runner::get_version(&binary_path);
@@ -100,16 +106,15 @@ fn main() -> Result<()> {
 
     // Generate output
     let output = match cli.format {
-        OutputFormat::Json => serde_json::to_string_pretty(&spec)
-            .context("Failed to serialize to JSON")?,
-        OutputFormat::Md => generator::generate_guide(&spec)
-            .context("Failed to generate guide")?,
+        OutputFormat::Json => {
+            serde_json::to_string_pretty(&spec).context("Failed to serialize to JSON")?
+        }
+        OutputFormat::Md => generator::generate_guide(&spec).context("Failed to generate guide")?,
     };
 
     // Write output
     if let Some(ref path) = cli.output {
-        security::write_output_safe(path, &output)
-            .context("Failed to write output file")?;
+        security::write_output_safe(path, &output).context("Failed to write output file")?;
         eprintln!("Guide written to output file");
     } else {
         print!("{output}");

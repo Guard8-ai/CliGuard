@@ -30,7 +30,11 @@ fn write_header(out: &mut String, spec: &ToolSpec) -> std::fmt::Result {
     writeln!(out, "# {} for AI Agents", escape_markdown(&spec.name))?;
     writeln!(out)?;
     if !spec.description.is_empty() {
-        writeln!(out, "{}", safe_description(&spec.description, MAX_DESCRIPTION_LENGTH))?;
+        writeln!(
+            out,
+            "{}",
+            safe_description(&spec.description, MAX_DESCRIPTION_LENGTH)
+        )?;
         writeln!(out)?;
     }
     Ok(())
@@ -154,7 +158,11 @@ fn write_command_detail(
     writeln!(out)?;
 
     if !cmd.description.is_empty() {
-        writeln!(out, "{}", safe_description(&cmd.description, MAX_DESCRIPTION_LENGTH))?;
+        writeln!(
+            out,
+            "{}",
+            safe_description(&cmd.description, MAX_DESCRIPTION_LENGTH)
+        )?;
         writeln!(out)?;
     }
 
@@ -244,11 +252,7 @@ fn format_flag_name(flag: &Flag) -> String {
 }
 
 fn format_flag_usage(flag: &Flag) -> String {
-    let name = flag
-        .long
-        .as_deref()
-        .or(flag.short.as_deref())
-        .unwrap_or("");
+    let name = flag.long.as_deref().or(flag.short.as_deref()).unwrap_or("");
     if flag.value_type == ValueType::Bool {
         name.to_string()
     } else {

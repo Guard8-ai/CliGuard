@@ -5,9 +5,8 @@ use anyhow::Result;
 use regex::Regex;
 use std::sync::LazyLock;
 
-static RE_GCLOUD_FLAG: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^\s{5}(--[\w-]+)(?:=([\w\[\],._]+))?\s*$").unwrap()
-});
+static RE_GCLOUD_FLAG: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^\s{5}(--[\w-]+)(?:=([\w\[\],._]+))?\s*$").unwrap());
 static RE_GCLOUD_SHORT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s{5}(-\w),\s+(--[\w-]+)").unwrap());
 static RE_GCLOUD_ENTRY: LazyLock<Regex> =
@@ -106,11 +105,7 @@ fn parse_gcloud_flags(help_output: &str, section: &str) -> Vec<Flag> {
                 flags.push(build_flag(None, &long, value.as_deref(), &current_desc));
                 current_desc.clear();
             }
-            current_flag = Some((
-                caps[2].to_string(),
-                None,
-                caps[1].to_string(),
-            ));
+            current_flag = Some((caps[2].to_string(), None, caps[1].to_string()));
             continue;
         }
 
@@ -154,9 +149,7 @@ fn parse_gcloud_flags(help_output: &str, section: &str) -> Vec<Flag> {
     // Filter help/version
     flags
         .into_iter()
-        .filter(|f| {
-            f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version")
-        })
+        .filter(|f| f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version"))
         .collect()
 }
 
@@ -357,7 +350,9 @@ COMMANDS
     fn parses_global_flags() {
         let flags = parse_gcloud_flags(SAMPLE_GCLOUD, "GLOBAL FLAGS");
         assert!(flags.len() >= 2);
-        let account = flags.iter().find(|f| f.long.as_deref() == Some("--account"));
+        let account = flags
+            .iter()
+            .find(|f| f.long.as_deref() == Some("--account"));
         assert!(account.is_some());
         let quiet = flags.iter().find(|f| f.long.as_deref() == Some("--quiet"));
         assert!(quiet.is_some());

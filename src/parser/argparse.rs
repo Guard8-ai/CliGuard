@@ -16,17 +16,14 @@ static RE_ARGPARSE_FLAG: LazyLock<Regex> = LazyLock::new(|| {
         .unwrap()
 });
 
-static RE_DEFAULT: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\(default:\s*(.+?)\)").unwrap());
+static RE_DEFAULT: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\(default:\s*(.+?)\)").unwrap());
 
-static RE_CHOICES: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\{([^}]+)\}").unwrap());
+static RE_CHOICES: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\{([^}]+)\}").unwrap());
 
 static RE_POSITIONAL_ENTRY: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*(\w+)\s{2,}(.+)$").unwrap());
 
-static RE_SUBPARSER: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\{([^}]+)\}").unwrap());
+static RE_SUBPARSER: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\{([^}]+)\}").unwrap());
 
 static RE_SUBCOMMAND_ENTRY: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*(\w[\w-]*)\s{2,}(.+)$").unwrap());
@@ -145,11 +142,7 @@ fn parse_optional_args(help_output: &str) -> Vec<Flag> {
             continue;
         }
 
-        if in_section
-            && !trimmed.is_empty()
-            && !line.starts_with(' ')
-            && !line.starts_with('\t')
-        {
+        if in_section && !trimmed.is_empty() && !line.starts_with(' ') && !line.starts_with('\t') {
             // Process last accumulated flag
             if !current_flag_text.is_empty() {
                 if let Some(flag) = parse_argparse_flag(&current_flag_text) {
@@ -192,9 +185,7 @@ fn parse_optional_args(help_output: &str) -> Vec<Flag> {
     // Filter help/version
     flags
         .into_iter()
-        .filter(|f| {
-            f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version")
-        })
+        .filter(|f| f.long.as_deref() != Some("--help") && f.long.as_deref() != Some("--version"))
         .collect()
 }
 
@@ -222,13 +213,11 @@ fn parse_argparse_flag(line: &str) -> Option<Flag> {
         .map(|c| c[1].trim().to_string());
 
     // Check for choices: {a,b,c}
-    let choices = RE_CHOICES
-        .captures(&description)
-        .map(|c| {
-            c[1].split(',')
-                .map(|s| s.trim().to_string())
-                .collect::<Vec<_>>()
-        });
+    let choices = RE_CHOICES.captures(&description).map(|c| {
+        c[1].split(',')
+            .map(|s| s.trim().to_string())
+            .collect::<Vec<_>>()
+    });
 
     let final_type = if let Some(ref choices) = choices {
         ValueType::Enum(choices.clone())
@@ -259,10 +248,7 @@ fn parse_positional_args(help_output: &str) -> Vec<Arg> {
             continue;
         }
 
-        if in_positional
-            && !trimmed.is_empty()
-            && !line.starts_with(' ')
-            && !line.starts_with('\t')
+        if in_positional && !trimmed.is_empty() && !line.starts_with(' ') && !line.starts_with('\t')
         {
             break;
         }
@@ -365,7 +351,8 @@ fn parse_subparsers(
                         cmd.flags = parse_optional_args(&sub_output);
                         cmd.args = parse_positional_args(&sub_output);
                         let sub_name = format!("{binary_name} {cmd_name}");
-                        let (sub_cmds, _) = parse_subparsers(&sub_output, &sub_name, sub_help, depth + 1);
+                        let (sub_cmds, _) =
+                            parse_subparsers(&sub_output, &sub_name, sub_help, depth + 1);
                         cmd.subcommands = sub_cmds;
                     }
                 }

@@ -22,7 +22,12 @@ pub trait Parser {
     fn detect(&self, help_output: &str) -> bool;
 
     /// Parse the help output into a `ToolSpec`.
-    fn parse(&self, binary_name: &str, help_output: &str, sub_help: &dyn Fn(&str) -> Option<String>) -> Result<ToolSpec>;
+    fn parse(
+        &self,
+        binary_name: &str,
+        help_output: &str,
+        sub_help: &dyn Fn(&str) -> Option<String>,
+    ) -> Result<ToolSpec>;
 }
 
 /// Registry of all available parsers, used for auto-detection.
@@ -60,7 +65,9 @@ impl ParserRegistry {
             }
         }
         // Fallback to GNU-style as it's the most generic
-        let fallback = self.parsers.last()
+        let fallback = self
+            .parsers
+            .last()
             .ok_or_else(|| anyhow::anyhow!("No parsers registered"))?;
         eprintln!("No framework detected, falling back to {}", fallback.name());
         fallback.parse(binary_name, help_output, sub_help)

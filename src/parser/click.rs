@@ -121,8 +121,12 @@ fn parse_click_commands(
             let mut full_cmd = cmd;
             if depth < MAX_SUBCOMMAND_DEPTH {
                 if let Some(sub_output) = sub_help(&full_cmd.name) {
-                    let (sub_cmds, _) =
-                        parse_click_commands(&sub_output, &format!("{binary_name} {}", full_cmd.name), sub_help, depth + 1);
+                    let (sub_cmds, _) = parse_click_commands(
+                        &sub_output,
+                        &format!("{binary_name} {}", full_cmd.name),
+                        sub_help,
+                        depth + 1,
+                    );
                     full_cmd.subcommands = sub_cmds;
                     full_cmd.flags = parse_click_options(&sub_output);
                     full_cmd.args = parse_click_args(&sub_output);
@@ -197,7 +201,9 @@ fn parse_click_flag(line: &str) -> Option<Flag> {
     let type_hint = caps.get(3).map(|m| m.as_str().to_string());
     let description = caps[4].trim().to_string();
 
-    let value_type = type_hint.as_deref().map_or(ValueType::Bool, infer_click_type);
+    let value_type = type_hint
+        .as_deref()
+        .map_or(ValueType::Bool, infer_click_type);
 
     let default = RE_DEFAULT
         .captures(&description)

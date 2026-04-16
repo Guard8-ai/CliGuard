@@ -12,8 +12,7 @@ const TIMEOUT: Duration = Duration::from_secs(10);
 /// Maximum size of captured help output (10 MB).
 const MAX_OUTPUT_BYTES: usize = 10 * 1024 * 1024;
 
-static RE_ANSI: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\x1b\[[0-9;]*[a-zA-Z]").unwrap());
+static RE_ANSI: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\x1b\[[0-9;]*[a-zA-Z]").unwrap());
 
 /// Strip ANSI escape codes from a string.
 fn strip_ansi(s: &str) -> String {
@@ -33,10 +32,7 @@ fn run_binary(binary: &Path, args: &[&str]) -> Result<String> {
         // Timed out — kill the child and bail
         let _ = child.kill();
         let _ = child.wait();
-        anyhow::bail!(
-            "Binary timed out after {}s",
-            TIMEOUT.as_secs()
-        );
+        anyhow::bail!("Binary timed out after {}s", TIMEOUT.as_secs());
     }
 
     let output = child.wait_with_output()?;
@@ -76,7 +72,9 @@ pub fn get_help(binary: &Path) -> Result<String> {
             return Ok(output);
         }
     }
-    let name = binary.file_name().map_or("unknown", |n| n.to_str().unwrap_or("unknown"));
+    let name = binary
+        .file_name()
+        .map_or("unknown", |n| n.to_str().unwrap_or("unknown"));
     anyhow::bail!("Could not get help output from: {name}")
 }
 

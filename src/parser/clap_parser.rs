@@ -7,8 +7,7 @@ use std::sync::LazyLock;
 
 static RE_VERSION: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\b(\d+\.\d+\.\d+(?:-\w+)?)\b").unwrap());
-static RE_VERSION_LINE: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\b\d+\.\d+\.\d+").unwrap());
+static RE_VERSION_LINE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\b\d+\.\d+\.\d+").unwrap());
 static RE_COMMAND_LINE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*(\S+)\s{2,}(.+)$").unwrap());
 static RE_FLAG: LazyLock<Regex> = LazyLock::new(|| {
@@ -16,8 +15,7 @@ static RE_FLAG: LazyLock<Regex> = LazyLock::new(|| {
 });
 static RE_DEFAULT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"\[default:\s*([^\]]+)\]").unwrap());
-static RE_ENV: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\[env:\s*([^\]]+)\]").unwrap());
+static RE_ENV: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\[env:\s*([^\]]+)\]").unwrap());
 static RE_ARG_LINE: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"^\s*[<\[](\w+)[>\]]\s{2,}(.+)$").unwrap());
 
@@ -34,11 +32,15 @@ impl Parser for ClapParser {
 
     fn detect(&self, help_output: &str) -> bool {
         let has_usage = help_output.contains("Usage:");
-        let has_commands = help_output.contains("Commands:") || help_output.contains("Subcommands:");
+        let has_commands =
+            help_output.contains("Commands:") || help_output.contains("Subcommands:");
         let has_options = help_output.contains("Options:");
         let has_help_flag = help_output.contains("-h, --help");
 
-        has_usage && has_options && has_help_flag && (has_commands || !help_output.contains("Available Commands:"))
+        has_usage
+            && has_options
+            && has_help_flag
+            && (has_commands || !help_output.contains("Available Commands:"))
     }
 
     fn parse(
@@ -142,7 +144,8 @@ fn parse_commands_section(
             let mut full_cmd = cmd;
             if depth < MAX_SUBCOMMAND_DEPTH {
                 if let Some(sub_output) = sub_help(&full_cmd.name) {
-                    let (sub_cmds, _) = parse_commands_section(&sub_output, &sub_key, sub_help, depth + 1);
+                    let (sub_cmds, _) =
+                        parse_commands_section(&sub_output, &sub_key, sub_help, depth + 1);
                     full_cmd.subcommands = sub_cmds;
                     full_cmd.flags = parse_options_section(&sub_output);
                     full_cmd.args = parse_args_section(&sub_output);
